@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./jquery-3.6.1.min.js"></script>
+    <script src="https://kit.fontawesome.com/5ff44efe3e.js" crossorigin="anonymous"></script>
+    <style>
+
+        .black{
+            background-color: black;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div id="tabuleiro"></div>
+
+    <script>
+        //Montagem do tabuleiro
+        const row = 10;
+        const column = 10;
+        const board = row * column;
+        var currentLine = 1;
+        for (let index = 1; index <= board; index++) {
+
+            var ColumnPosition = index % column;
+            if(ColumnPosition == 0){
+                ColumnPosition = 10;
+            }
+            let boardElement = document.createElement("div");
+            boardElement.setAttribute("row", currentLine);
+            boardElement.setAttribute("column", ColumnPosition);
+
+            if(currentLine%2 == 0){
+                if(index%2 == 0){
+                    boardElement.classList.add("black");
+                }
+            }else{
+                if(index%2 !== 0){
+                    boardElement.classList.add("black");
+                }
+            }
+
+            $("#tabuleiro").append(boardElement)
+
+            if(ColumnPosition == 10){
+                currentLine++;
+            }
+
+        }
+        $("#tabuleiro").css("display", "grid")
+        .css("gridTemplateColumns", "repeat("+column+", 30px)")
+        .css("gridTemplateRows", "repeat("+row+", 30px)")
+        .css("gap", 0)
+        .css("justifyContent", "center")
+        .css("textAlign","center")
+        .css("fontWeight", "bold")
+        
+        $("#tabuleiro div").css("border", "1px solid black");
+
+        
+        var position = {
+            'row': 1,
+            'column': 1
+        };
+        var historic = [
+            {
+            "index": 1,
+            "row": position.row,
+            "column": position.column
+            }
+        ];
+        //Peças e posicionamento
+        function reload(){
+            $("#tabuleiro div").each((indice, element)=>{
+             let row = element.getAttribute("row");
+             let column = element.getAttribute("column");
+             if(position.row == row && position.column == column){
+                 element.innerHTML = "<i class='fa-solid fa-chess-knight'></i>";
+             }else if(Math.abs(position.row - row) == 2){
+                if(Math.abs(position.column - column) == 1 ){
+                    element.classList.add("option")
+                }
+
+             }else if(Math.abs(position.row - row)== 1){
+                if(Math.abs(position.column - column) == 2 ){
+                    element.classList.add("option")
+                }
+             }
+        })
+        }
+        reload();        
+
+        // iniciando os testes
+        setInterval(()=>{
+            let options = $(".option").length
+            test()
+            function test(){
+                let optionSelect = parseInt(Math.random()*options)            
+                if($(".option")[optionSelect].innerHTML !== ""){
+                    test();
+                }else{
+                    position.row = $(".option")[optionSelect].getAttribute("row");
+                    position.column = $(".option")[optionSelect].getAttribute("column");
+                    historic.push({
+                        "index": historic[historic.length-1].index+1,
+                        "row": position.row,
+                        "column": position.column
+                    })
+                }
+            }
+            $(".option").each((i,element)=>{
+                element.classList.remove("option");
+            })
+            reload();
+        }, 1000)               
+
+
+    </script>    
+</body>
+</html>
